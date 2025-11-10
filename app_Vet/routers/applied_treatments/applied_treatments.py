@@ -1,71 +1,79 @@
 from decimal import Decimal
-from uuid import UUID, uuid4
-from fastapi import APIRouter
+from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from app_Vet.database.config.database import get_db
+from app_Vet.database.models.models import AppliedTreatment as AppliedTreatmentModel
 
 router = APIRouter(prefix="/applied-treatments", tags=["Applied Treatments"])
 
 class AppliedTreatment(BaseModel):
-    id_aplicacion: UUID
-    id_historia: UUID
-    id_tratamiento: UUID
+    id_aplicacion: str
+    id_historia: str
+    id_tratamiento: str
     cantidad: Decimal
     precio_aplicado: Decimal
     total: Decimal
+    
+    class Config:
+        from_attributes = True
 
 class AppliedTreatmentCreate(BaseModel):
-    id_historia: UUID
-    id_tratamiento: UUID
+    id_historia: str
+    id_tratamiento: str
     cantidad: Decimal
     precio_aplicado: Decimal
     total: Decimal
 
-applied_treatments = []
-
 @router.get("/")
-def list_applied_treatments():
+def list_applied_treatments(db: Session = Depends(get_db)):
+    applied_treatments = db.query(AppliedTreatmentModel).all()
     return {"tratamientos_aplicados": applied_treatments}
 
 @router.post("/")
-def create_applied_treatment(applied_treatment: AppliedTreatmentCreate):
-    new_applied_treatment = AppliedTreatment(
-        id_aplicacion=uuid4(),
+def create_applied_treatment(applied_treatment: AppliedTreatmentCreate, db: Session = Depends(get_db)):
+    db_applied_treatment = AppliedTreatmentModel(
         id_historia=applied_treatment.id_historia,
         id_tratamiento=applied_treatment.id_tratamiento,
         cantidad=applied_treatment.cantidad,
         precio_aplicado=applied_treatment.precio_aplicado,
         total=applied_treatment.total
     )
-    applied_treatments.append(new_applied_treatment)
-    return {"mensaje": "Tratamiento aplicado creado correctamente", "applied_treatment": new_applied_treatment}
+    db.add(db_applied_treatment)
+    db.commit()
+    db.refresh(db_applied_treatment)
+    return {"mensaje": "Tratamiento aplicado creado correctamente", "applied_treatment": db_applied_treatment}
 
 @router.get("/{applied_treatment_id}")
-def get_applied_treatment(applied_treatment_id: UUID):
-    for at in applied_treatments:
-        if at.id_aplicacion == applied_treatment_id:
-            return at
-    return {"error": "Tratamiento aplicado no encontrado"}
+def get_applied_treatment(applied_treatment_id: str, db: Session = Depends(get_db)):
+    applied_treatment = db.query(AppliedTreatmentModel).filter(AppliedTreatmentModel.id_aplicacion == applied_treatment_id).first()
+    if not applied_treatment:
+        raise HTTPException(status_code=404, detail="Tratamiento aplicado no encontrado")
+    return applied_treatment
 
 @router.put("/{applied_treatment_id}")
-def update_applied_treatment(applied_treatment_id: UUID, applied_treatment_update: AppliedTreatmentCreate):
-    for i, at in enumerate(applied_treatments):
-        if at.id_aplicacion == applied_treatment_id:
-            applied_treatments[i] = AppliedTreatment(
-                id_aplicacion=applied_treatment_id,
-                id_historia=applied_treatment_update.id_historia,
-                id_tratamiento=applied_treatment_update.id_tratamiento,
-                cantidad=applied_treatment_update.cantidad,
-                precio_aplicado=applied_treatment_update.precio_aplicado,
-                total=applied_treatment_update.total
-            )
-            return {"mensaje": "Tratamiento aplicado actualizado", "applied_treatment": applied_treatments[i]}
-    return {"error": "Tratamiento aplicado no encontrado"}
+def update_applied_treatment(applied_treatment_id: str, applied_treatment_update: AppliedTreatmentCreate, db: Session = Depends(get_db)):
+    applied_treatment = db.query(AppliedTreatmentModel).filter(AppliedTreatmentModel.id_aplicacion == applied_treatment_id).first()
+    if not applied_treatment:
+        raise HTTPException(status_code=404, detail="Tratamiento aplicado no encontrado")
+    
+    applied_treatment.id_historia = applied_treatment_update.id_historia
+    applied_treatment.id_tratamiento = applied_treatment_update.id_tratamiento
+    applied_treatment.cantidad = applied_treatment_update.cantidad
+    applied_treatment.precio_aplicado = applied_treatment_update.precio_aplicado
+    applied_treatment.total = applied_treatment_update.total
+    
+    db.commit()
+    db.refresh(applied_treatment)
+    return {"mensaje": "Tratamiento aplicado actualizado", "applied_treatment": applied_treatment}
 
 @router.delete("/{applied_treatment_id}")
-def delete_applied_treatment(applied_treatment_id: UUID):
-    for i, at in enumerate(applied_treatments):
-        if at.id_aplicacion == applied_treatment_id:
-            applied_treatments.pop(i)
-            return {"mensaje": "Tratamiento aplicado eliminado"}
-    return {"error": "Tratamiento aplicado no encontrado"}
-
+def delete_applied_treatment(applied_treatment_id: str, db: Session = Depends(get_db)):
+    applied_treatment = db.query(AppliedTreatmentModel).filter(AppliedTreatmentModel.id_aplicacion == applied_treatment_id).first()
+    if not applied_treatment:
+        raise HTTPException(status_code=404, detail="Tratamiento aplicado no encontrado")
+    
+    db.delete(applied_treatment)
+    db.commit()
+    return {"mensaje": "Tratamiento aplicado eliminado"}

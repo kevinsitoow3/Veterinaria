@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from app_Vet.database.config.database import engine, Base
+# Importar todos los modelos para que se registren en Base.metadata
+from app_Vet.database.models import models
 from app_Vet.routers.owners import router as owners_router
 from app_Vet.routers.species import router as species_router
 from app_Vet.routers.breeds import router as breeds_router
@@ -10,6 +13,9 @@ from app_Vet.routers.quotes import router as quotes_router
 from app_Vet.routers.clinical_histories import router as clinical_histories_router
 from app_Vet.routers.treatments import router as treatments_router
 from app_Vet.routers.applied_treatments import router as applied_treatments_router
+
+# Crear las tablas en la base de datos
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Veterinaria API",

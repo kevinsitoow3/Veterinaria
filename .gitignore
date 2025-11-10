@@ -56,9 +56,7 @@ htmlcov/
 *.swp
 *.swo
 *~
-.cursor/
-*.sublime-project
-*.sublime-workspace
+
 
 # OS
 .DS_Store
