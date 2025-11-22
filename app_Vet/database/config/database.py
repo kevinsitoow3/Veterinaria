@@ -1,29 +1,30 @@
+from sqlalchemy.orm.session import Session
+
+
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# URL de conexión a la base de datos
-# SQLite (para desarrollo)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./veterinaria.db"
+
+sqlliteName = "veterinary.sqlite"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+database_url = f"sqlite:///{os.path.join(base_dir, sqlliteName)}"
 
 
-# Crear el motor de la base de datos
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    # Para SQLite, necesitamos este parámetro
-    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
+engine = create_engine(database_url, echo=True,
+    connect_args={"check_same_thread": False} if "sqlite" in database_url else {}
 )
 
-# Crear la clase SessionLocal
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Session= sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base para los modelos
+
 Base = declarative_base()
 
-# Dependencia para obtener la sesión de base de datos
 def get_db():
-    db = SessionLocal()
+    db = Session()
     try:
         yield db
     finally:
         db.close()
+
