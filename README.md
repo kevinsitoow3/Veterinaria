@@ -1,57 +1,83 @@
-# 🐾 API Veterinaria
+# 🐾 Sistema de Gestión Veterinaria
 
-API REST desarrollada con FastAPI para la gestión de una clínica veterinaria.
+Sistema completo de gestión para clínicas veterinarias, desarrollado con FastAPI (Backend) y React (Frontend).
 
 ## 📋 Descripción
 
 Sistema de gestión que permite administrar propietarios, mascotas, veterinarios, citas, historiales clínicos, tratamientos y servicios de una clínica veterinaria.
 
-## 🚀 Requisitos
+## 🏗️ Estructura del Proyecto
 
-- Python 3.8 o superior
-- pip
-
-## 📦 Instalación
-
-1. Clona el repositorio:
-```bash
-git clone <url-del-repositorio>
-cd Veterinaria
+```
+Veterinaria/
+├── Back-end/          # API REST con FastAPI
+│   ├── database/
+│   │   ├── database.py      # Configuración de la base de datos
+│   │   └── veterinary.sqlite # Base de datos SQLite
+│   ├── models/              # Modelos SQLAlchemy
+│   ├── routers/             # Endpoints de la API
+│   ├── schemas/             # Schemas de Pydantic
+│   ├── main.py              # Punto de entrada
+│   └── requirements.txt     # Dependencias
+│
+└── Front-end/         # Interfaz de usuario con React
+    ├── src/           # Código fuente
+    ├── public/        # Archivos públicos
+    └── package.json
 ```
 
-2. Crea un entorno virtual:
+## 🚀 Inicio Rápido
+
+### Backend
+
+1. Navega a la carpeta Back-end:
+```bash
+cd Back-end
+```
+
+2. Crea y activa un entorno virtual:
 ```bash
 python -m venv venv
-```
-
-3. Activa el entorno virtual:
-- Windows:
-```bash
+# Windows
 venv\Scripts\activate
-```
-- Linux/Mac:
-```bash
+# Linux/Mac
 source venv/bin/activate
 ```
 
-4. Instala las dependencias:
+3. Instala las dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
-## ▶️ Uso
-
-Para ejecutar el servidor de desarrollo:
-
+4. Ejecuta el servidor:
 ```bash
 uvicorn main:app --reload
 ```
 
-La API estará disponible en: `http://localhost:8000`
+El backend estará disponible en: `http://localhost:8000`
+
+### Frontend
+
+1. Navega a la carpeta Front-end:
+```bash
+cd Front-end
+```
+
+2. Instala las dependencias:
+```bash
+npm install
+```
+
+3. Ejecuta la aplicación:
+```bash
+npm start
+```
+
+El frontend estará disponible en: `http://localhost:3000`
 
 ## 📚 Documentación
 
-Una vez que el servidor esté corriendo, puedes acceder a:
+Una vez que el backend esté corriendo, puedes acceder a:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
@@ -72,11 +98,18 @@ Una vez que el servidor esté corriendo, puedes acceder a:
 
 ## 🛠️ Tecnologías
 
+### Backend
 - **FastAPI** - Framework web moderno y rápido
 - **Uvicorn** - Servidor ASGI
+- **SQLAlchemy** - ORM para Python
 - **Pydantic** - Validación de datos
+- **SQLite** - Base de datos
+
+### Frontend
+- **React** - Biblioteca de JavaScript
+- **Axios** - Cliente HTTP
+- **CSS3** - Estilos modernos
 
 ## 📝 Licencia
 
 Este proyecto es de uso privado.
-
