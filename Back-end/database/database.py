@@ -9,7 +9,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 database_url = f"sqlite:///{os.path.join(base_dir, sqlliteName)}"
 
 
-engine = create_engine(database_url, echo=True,
+engine = create_engine(database_url, echo=False,
     connect_args={"check_same_thread": False} if "sqlite" in database_url else {}
 )
 
