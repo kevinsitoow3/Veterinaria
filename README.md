@@ -81,7 +81,7 @@ npm install
 npm run dev
 ```
 
-El frontend estará disponible en: `http://localhost:5173` (puerto por defecto de Vite)
+El frontend estará disponible en: `http://localhost:3000` (puerto por defecto de Vite)
 
 **Nota:** Asegúrate de actualizar la configuración CORS en `Back-end/main.py` si usas un puerto diferente.
 
