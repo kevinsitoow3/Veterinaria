@@ -29,9 +29,10 @@ const Rooms = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Nombre de la Sala *</label>
             <input
               type="text"
-              placeholder="Nombre de la sala"
+              placeholder="Ej: Sala 1, Consultorio A, Quirófano"
               value={formData.nombre_sala}
               onChange={(e) => handleFieldChange('nombre_sala', e.target.value)}
               className={errors.nombre_sala ? 'error' : ''}

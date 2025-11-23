@@ -37,6 +37,7 @@ const Quotes = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Mascota *</label>
             <select
               value={formData.id_mascota}
               onChange={(e) => handleFieldChange('id_mascota', e.target.value)}
@@ -52,6 +53,7 @@ const Quotes = () => {
             {errors.id_mascota && <span className="error-message">{errors.id_mascota}</span>}
           </div>
           <div className="form-group">
+            <label>Veterinario * (Solo activos)</label>
             <select
               value={formData.id_veterinario}
               onChange={(e) => handleFieldChange('id_veterinario', e.target.value)}
@@ -67,6 +69,7 @@ const Quotes = () => {
             {errors.id_veterinario && <span className="error-message">{errors.id_veterinario}</span>}
           </div>
           <div className="form-group">
+            <label>Servicio *</label>
             <select
               value={formData.id_servicio}
               onChange={(e) => handleFieldChange('id_servicio', e.target.value)}
@@ -82,6 +85,7 @@ const Quotes = () => {
             {errors.id_servicio && <span className="error-message">{errors.id_servicio}</span>}
           </div>
           <div className="form-group">
+            <label>Sala *</label>
             <select
               value={formData.id_sala}
               onChange={(e) => handleFieldChange('id_sala', e.target.value)}
@@ -119,6 +123,7 @@ const Quotes = () => {
             {errors.fecha_fin && <span className="error-message">{errors.fecha_fin}</span>}
           </div>
           <div className="form-group">
+            <label>Estado de la Cita *</label>
             <select
               value={formData.estado_cita}
               onChange={(e) => handleFieldChange('estado_cita', e.target.value)}

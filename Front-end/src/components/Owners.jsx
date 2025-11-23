@@ -29,9 +29,10 @@ const Owners = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Nombre del Dueño *</label>
             <input
               type="text"
-              placeholder="Nombre"
+              placeholder="Ej: Juan Pérez"
               value={formData.nombre_dueño}
               onChange={(e) => handleFieldChange('nombre_dueño', e.target.value)}
               className={errors.nombre_dueño ? 'error' : ''}
@@ -39,9 +40,10 @@ const Owners = () => {
             {errors.nombre_dueño && <span className="error-message">{errors.nombre_dueño}</span>}
           </div>
           <div className="form-group">
+            <label>Teléfono *</label>
             <input
               type="tel"
-              placeholder="Teléfono"
+              placeholder="Ej: +57 300 1234567"
               value={formData.telefono_dueño}
               onChange={(e) => handleFieldChange('telefono_dueño', e.target.value)}
               className={errors.telefono_dueño ? 'error' : ''}
@@ -49,9 +51,10 @@ const Owners = () => {
             {errors.telefono_dueño && <span className="error-message">{errors.telefono_dueño}</span>}
           </div>
           <div className="form-group">
+            <label>Correo Electrónico *</label>
             <input
               type="email"
-              placeholder="Correo"
+              placeholder="Ej: juan.perez@email.com"
               value={formData.correo_dueño}
               onChange={(e) => handleFieldChange('correo_dueño', e.target.value)}
               className={errors.correo_dueño ? 'error' : ''}
@@ -59,9 +62,10 @@ const Owners = () => {
             {errors.correo_dueño && <span className="error-message">{errors.correo_dueño}</span>}
           </div>
           <div className="form-group">
+            <label>Dirección *</label>
             <input
               type="text"
-              placeholder="Dirección"
+              placeholder="Ej: Calle 123 #45-67, Barrio Centro"
               value={formData.direccion_dueño}
               onChange={(e) => handleFieldChange('direccion_dueño', e.target.value)}
               className={errors.direccion_dueño ? 'error' : ''}
