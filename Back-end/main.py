@@ -68,3 +68,7 @@ app.include_router(quotes_router, prefix=API_PREFIX)
 app.include_router(clinical_histories_router, prefix=API_PREFIX)
 app.include_router(treatments_router, prefix=API_PREFIX)
 app.include_router(applied_treatments_router, prefix=API_PREFIX)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
