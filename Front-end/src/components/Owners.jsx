@@ -9,7 +9,8 @@ const Owners = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -27,34 +28,46 @@ const Owners = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={formData.nombre_dueño}
-            onChange={(e) => setFormData({ ...formData, nombre_dueño: e.target.value })}
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Teléfono"
-            value={formData.telefono_dueño}
-            onChange={(e) => setFormData({ ...formData, telefono_dueño: e.target.value })}
-            required
-          />
-          <input
-            type="email"
-            placeholder="Correo"
-            value={formData.correo_dueño}
-            onChange={(e) => setFormData({ ...formData, correo_dueño: e.target.value })}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Dirección"
-            value={formData.direccion_dueño}
-            onChange={(e) => setFormData({ ...formData, direccion_dueño: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={formData.nombre_dueño}
+              onChange={(e) => handleFieldChange('nombre_dueño', e.target.value)}
+              className={errors.nombre_dueño ? 'error' : ''}
+            />
+            {errors.nombre_dueño && <span className="error-message">{errors.nombre_dueño}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="tel"
+              placeholder="Teléfono"
+              value={formData.telefono_dueño}
+              onChange={(e) => handleFieldChange('telefono_dueño', e.target.value)}
+              className={errors.telefono_dueño ? 'error' : ''}
+            />
+            {errors.telefono_dueño && <span className="error-message">{errors.telefono_dueño}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="email"
+              placeholder="Correo"
+              value={formData.correo_dueño}
+              onChange={(e) => handleFieldChange('correo_dueño', e.target.value)}
+              className={errors.correo_dueño ? 'error' : ''}
+            />
+            {errors.correo_dueño && <span className="error-message">{errors.correo_dueño}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Dirección"
+              value={formData.direccion_dueño}
+              onChange={(e) => handleFieldChange('direccion_dueño', e.target.value)}
+              className={errors.direccion_dueño ? 'error' : ''}
+            />
+            {errors.direccion_dueño && <span className="error-message">{errors.direccion_dueño}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Dueño
           </button>

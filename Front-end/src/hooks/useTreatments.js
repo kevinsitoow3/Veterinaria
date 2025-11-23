@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { treatmentsAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useTreatments = () => {
   const [treatments, setTreatments] = useState([]);
@@ -11,6 +12,7 @@ export const useTreatments = () => {
     descripcion_tratamiento: '',
     precio_tratamiento: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchTreatments();
@@ -29,8 +31,40 @@ export const useTreatments = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.nombre_tratamiento = validations.textOnlyMinLength(formData.nombre_tratamiento, 3, 'El nombre del tratamiento');
+    newErrors.descripcion_tratamiento = validations.description(formData.descripcion_tratamiento, 'La descripción');
+    newErrors.precio_tratamiento = validations.positiveDecimal(formData.precio_tratamiento, 'El precio', 100, true);
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'nombre_tratamiento':
+          error = validations.textOnlyMinLength(value, 3, 'El nombre del tratamiento');
+          break;
+        case 'descripcion_tratamiento':
+          error = validations.description(value, 'La descripción');
+          break;
+        case 'precio_tratamiento':
+          error = validations.positiveDecimal(value, 'El precio', 100, true);
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -80,6 +114,7 @@ export const useTreatments = () => {
       descripcion_tratamiento: '',
       precio_tratamiento: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -97,7 +132,8 @@ export const useTreatments = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

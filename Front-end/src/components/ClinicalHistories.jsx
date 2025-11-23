@@ -12,7 +12,8 @@ const ClinicalHistories = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -32,79 +33,105 @@ const ClinicalHistories = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <select
-            value={formData.id_mascota}
-            onChange={(e) => setFormData({ ...formData, id_mascota: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Mascota</option>
-            {pets.map((pet) => (
-              <option key={pet.id_mascota} value={pet.id_mascota}>
-                {pet.nombre_mascota}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.id_veterinario}
-            onChange={(e) => setFormData({ ...formData, id_veterinario: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Veterinario</option>
-            {veterinarians.map((vet) => (
-              <option key={vet.id_veterinario} value={vet.id_veterinario}>
-                {vet.nombre_veterinario}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.id_cita}
-            onChange={(e) => setFormData({ ...formData, id_cita: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Cita</option>
-            {quotes.map((quote) => (
-              <option key={quote.id_cita} value={quote.id_cita}>
-                Cita #{quote.id_cita}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Peso (kg)"
-            value={formData.peso_kg_animal}
-            onChange={(e) => setFormData({ ...formData, peso_kg_animal: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Temperatura (°C)"
-            value={formData.temperatura_animal}
-            onChange={(e) => setFormData({ ...formData, temperatura_animal: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="Síntomas"
-            value={formData.sintomas}
-            onChange={(e) => setFormData({ ...formData, sintomas: e.target.value })}
-            required
-            rows="3"
-          />
-          <textarea
-            placeholder="Diagnóstico"
-            value={formData.diagnostico}
-            onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
-            required
-            rows="3"
-          />
-          <textarea
-            placeholder="Plan de tratamiento"
-            value={formData.plan_tratamiento}
-            onChange={(e) => setFormData({ ...formData, plan_tratamiento: e.target.value })}
-            required
-            rows="3"
-          />
+          <div className="form-group">
+            <select
+              value={formData.id_mascota}
+              onChange={(e) => handleFieldChange('id_mascota', e.target.value)}
+              className={errors.id_mascota ? 'error' : ''}
+            >
+              <option value="">Seleccionar Mascota</option>
+              {pets.map((pet) => (
+                <option key={pet.id_mascota} value={pet.id_mascota}>
+                  {pet.nombre_mascota}
+                </option>
+              ))}
+            </select>
+            {errors.id_mascota && <span className="error-message">{errors.id_mascota}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.id_veterinario}
+              onChange={(e) => handleFieldChange('id_veterinario', e.target.value)}
+              className={errors.id_veterinario ? 'error' : ''}
+              disabled={!!formData.id_cita}
+            >
+              <option value="">Seleccionar Veterinario</option>
+              {veterinarians.map((vet) => (
+                <option key={vet.id_veterinario} value={vet.id_veterinario}>
+                  {vet.nombre_veterinario}
+                </option>
+              ))}
+            </select>
+            {formData.id_cita && <small style={{color: '#666', fontSize: '0.875rem'}}>Seleccionado automáticamente desde la cita</small>}
+            {errors.id_veterinario && <span className="error-message">{errors.id_veterinario}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.id_cita}
+              onChange={(e) => handleFieldChange('id_cita', e.target.value)}
+              className={errors.id_cita ? 'error' : ''}
+            >
+              <option value="">Seleccionar Cita</option>
+              {quotes.map((quote) => (
+                <option key={quote.id_cita} value={quote.id_cita}>
+                  Cita #{quote.id_cita}
+                </option>
+              ))}
+            </select>
+            {errors.id_cita && <span className="error-message">{errors.id_cita}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="number"
+              step="0.1"
+              placeholder="Peso (kg)"
+              value={formData.peso_kg_animal}
+              onChange={(e) => handleFieldChange('peso_kg_animal', e.target.value)}
+              className={errors.peso_kg_animal ? 'error' : ''}
+            />
+            {errors.peso_kg_animal && <span className="error-message">{errors.peso_kg_animal}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="number"
+              step="0.1"
+              placeholder="Temperatura (°C)"
+              value={formData.temperatura_animal}
+              onChange={(e) => handleFieldChange('temperatura_animal', e.target.value)}
+              className={errors.temperatura_animal ? 'error' : ''}
+            />
+            {errors.temperatura_animal && <span className="error-message">{errors.temperatura_animal}</span>}
+          </div>
+          <div className="form-group">
+            <textarea
+              placeholder="Síntomas"
+              value={formData.sintomas}
+              onChange={(e) => handleFieldChange('sintomas', e.target.value)}
+              className={errors.sintomas ? 'error' : ''}
+              rows="3"
+            />
+            {errors.sintomas && <span className="error-message">{errors.sintomas}</span>}
+          </div>
+          <div className="form-group">
+            <textarea
+              placeholder="Diagnóstico"
+              value={formData.diagnostico}
+              onChange={(e) => handleFieldChange('diagnostico', e.target.value)}
+              className={errors.diagnostico ? 'error' : ''}
+              rows="3"
+            />
+            {errors.diagnostico && <span className="error-message">{errors.diagnostico}</span>}
+          </div>
+          <div className="form-group">
+            <textarea
+              placeholder="Plan de tratamiento"
+              value={formData.plan_tratamiento}
+              onChange={(e) => handleFieldChange('plan_tratamiento', e.target.value)}
+              className={errors.plan_tratamiento ? 'error' : ''}
+              rows="3"
+            />
+            {errors.plan_tratamiento && <span className="error-message">{errors.plan_tratamiento}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Historial
           </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { breedsAPI, speciesAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useBreeds = () => {
   const [breeds, setBreeds] = useState([]);
@@ -11,6 +12,7 @@ export const useBreeds = () => {
     id_especie: '',
     nombre_raza: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchBreeds();
@@ -39,8 +41,31 @@ export const useBreeds = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.id_especie = validations.select(formData.id_especie, 'una especie');
+    newErrors.nombre_raza = validations.textOnly(formData.nombre_raza, 'El nombre de la raza');
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      if (field === 'id_especie') {
+        error = validations.select(value, 'una especie');
+      } else if (field === 'nombre_raza') {
+        error = validations.textOnly(value, 'El nombre de la raza');
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -85,6 +110,7 @@ export const useBreeds = () => {
 
   const resetForm = () => {
     setFormData({ id_especie: '', nombre_raza: '' });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -108,7 +134,8 @@ export const useBreeds = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

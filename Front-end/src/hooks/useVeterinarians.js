@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { veterinariansAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useVeterinarians = () => {
   const [veterinarians, setVeterinarians] = useState([]);
@@ -13,6 +14,7 @@ export const useVeterinarians = () => {
     especialidad_veterinario: '',
     estado_veterinario: true
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchVeterinarians();
@@ -31,8 +33,44 @@ export const useVeterinarians = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.nombre_veterinario = validations.name(formData.nombre_veterinario);
+    newErrors.correo_veterinario = validations.email(formData.correo_veterinario);
+    newErrors.telefono_veterinario = validations.phone(formData.telefono_veterinario);
+    newErrors.especialidad_veterinario = validations.textOnly(formData.especialidad_veterinario, 'La especialidad');
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'nombre_veterinario':
+          error = validations.name(value);
+          break;
+        case 'correo_veterinario':
+          error = validations.email(value);
+          break;
+        case 'telefono_veterinario':
+          error = validations.phone(value);
+          break;
+        case 'especialidad_veterinario':
+          error = validations.textOnly(value, 'La especialidad');
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       if (editingId) {
         await veterinariansAPI.update(editingId, formData);
@@ -82,6 +120,7 @@ export const useVeterinarians = () => {
       especialidad_veterinario: '',
       estado_veterinario: true
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -99,7 +138,9 @@ export const useVeterinarians = () => {
     showForm,
     editingId,
     formData,
+    errors,
     setFormData,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

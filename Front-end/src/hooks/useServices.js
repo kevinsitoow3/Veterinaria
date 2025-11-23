@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { servicesAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useServices = () => {
   const [services, setServices] = useState([]);
@@ -11,6 +12,7 @@ export const useServices = () => {
     descripcion_servicio: '',
     precio_servicio: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchServices();
@@ -29,8 +31,40 @@ export const useServices = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.nombre_servicio = validations.textMinLength(formData.nombre_servicio, 3, 'El nombre del servicio');
+    newErrors.descripcion_servicio = validations.description(formData.descripcion_servicio, 'La descripción');
+    newErrors.precio_servicio = validations.positiveDecimal(formData.precio_servicio, 'El precio', 20000, true);
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'nombre_servicio':
+          error = validations.textMinLength(value, 3, 'El nombre del servicio');
+          break;
+        case 'descripcion_servicio':
+          error = validations.description(value, 'La descripción');
+          break;
+        case 'precio_servicio':
+          error = validations.positiveDecimal(value, 'El precio', 20000, true);
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -80,6 +114,7 @@ export const useServices = () => {
       descripcion_servicio: '',
       precio_servicio: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -97,7 +132,8 @@ export const useServices = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { appliedTreatmentsAPI, clinicalHistoriesAPI, treatmentsAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useAppliedTreatments = () => {
   const [appliedTreatments, setAppliedTreatments] = useState([]);
@@ -15,6 +16,7 @@ export const useAppliedTreatments = () => {
     precio_aplicado: '',
     total: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchAppliedTreatments();
@@ -25,7 +27,7 @@ export const useAppliedTreatments = () => {
   useEffect(() => {
     if (formData.cantidad && formData.precio_aplicado) {
       const total = parseFloat(formData.cantidad) * parseFloat(formData.precio_aplicado);
-      setFormData(prev => ({ ...prev, total: total.toFixed(2) }));
+      setFormData(prev => ({ ...prev, total: Math.floor(total).toString() }));
     }
   }, [formData.cantidad, formData.precio_aplicado]);
 
@@ -60,8 +62,48 @@ export const useAppliedTreatments = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.id_historia = validations.select(formData.id_historia, 'un historial');
+    newErrors.id_tratamiento = validations.select(formData.id_tratamiento, 'un tratamiento');
+    newErrors.cantidad = validations.positiveDecimal(formData.cantidad, 'La cantidad');
+    newErrors.precio_aplicado = validations.positiveDecimal(formData.precio_aplicado, 'El precio aplicado');
+    newErrors.total = validations.positiveDecimal(formData.total, 'El total');
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'id_historia':
+          error = validations.select(value, 'un historial');
+          break;
+        case 'id_tratamiento':
+          error = validations.select(value, 'un tratamiento');
+          break;
+        case 'cantidad':
+          error = validations.positiveDecimal(value, 'La cantidad');
+          break;
+        case 'precio_aplicado':
+          error = validations.positiveDecimal(value, 'El precio aplicado');
+          break;
+        case 'total':
+          error = validations.positiveDecimal(value, 'El total');
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -119,6 +161,7 @@ export const useAppliedTreatments = () => {
       precio_aplicado: '',
       total: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -137,11 +180,17 @@ export const useAppliedTreatments = () => {
 
   const handleTreatmentChange = (treatmentId) => {
     const treatment = treatments.find(t => t.id_tratamiento === parseInt(treatmentId));
-    setFormData(prev => ({
-      ...prev,
+    const newFormData = {
+      ...formData,
       id_tratamiento: treatmentId,
       precio_aplicado: treatment ? treatment.precio_tratamiento : ''
-    }));
+    };
+    setFormData(newFormData);
+    // Validar en tiempo real
+    if (errors.id_tratamiento) {
+      const error = validations.select(treatmentId, 'un tratamiento');
+      setErrors({ ...errors, id_tratamiento: error });
+    }
   };
 
   return {
@@ -152,7 +201,8 @@ export const useAppliedTreatments = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

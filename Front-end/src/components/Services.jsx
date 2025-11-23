@@ -1,5 +1,6 @@
 import React from 'react';
 import { useServices } from '../hooks/useServices';
+import { formatNumber } from '../utils/formatNumber';
 import '../styles/Services.css';
 
 const Services = () => {
@@ -9,7 +10,8 @@ const Services = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -27,28 +29,37 @@ const Services = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Nombre del servicio"
-            value={formData.nombre_servicio}
-            onChange={(e) => setFormData({ ...formData, nombre_servicio: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="Descripción"
-            value={formData.descripcion_servicio}
-            onChange={(e) => setFormData({ ...formData, descripcion_servicio: e.target.value })}
-            required
-            rows="3"
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Precio"
-            value={formData.precio_servicio}
-            onChange={(e) => setFormData({ ...formData, precio_servicio: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre del servicio"
+              value={formData.nombre_servicio}
+              onChange={(e) => handleFieldChange('nombre_servicio', e.target.value)}
+              className={errors.nombre_servicio ? 'error' : ''}
+            />
+            {errors.nombre_servicio && <span className="error-message">{errors.nombre_servicio}</span>}
+          </div>
+          <div className="form-group">
+            <textarea
+              placeholder="Descripción"
+              value={formData.descripcion_servicio}
+              onChange={(e) => handleFieldChange('descripcion_servicio', e.target.value)}
+              className={errors.descripcion_servicio ? 'error' : ''}
+              rows="3"
+            />
+            {errors.descripcion_servicio && <span className="error-message">{errors.descripcion_servicio}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Precio"
+              value={formData.precio_servicio}
+              onChange={(e) => handleFieldChange('precio_servicio', e.target.value)}
+              className={errors.precio_servicio ? 'error' : ''}
+            />
+            {errors.precio_servicio && <span className="error-message">{errors.precio_servicio}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Servicio
           </button>
@@ -63,7 +74,7 @@ const Services = () => {
             <div key={service.id_servicio} className="card">
               <h3>{service.nombre_servicio}</h3>
               <p>{service.descripcion_servicio}</p>
-              <p className="price">💰 ${parseFloat(service.precio_servicio).toFixed(2)}</p>
+              <p className="price">${formatNumber(service.precio_servicio)}</p>
               <div className="card-actions">
                 <button className="btn-edit" onClick={() => handleEdit(service)}>
                   Editar

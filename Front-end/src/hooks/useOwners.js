@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ownersAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useOwners = () => {
   const [owners, setOwners] = useState([]);
@@ -12,6 +13,7 @@ export const useOwners = () => {
     correo_dueño: '',
     direccion_dueño: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchOwners();
@@ -30,8 +32,50 @@ export const useOwners = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    newErrors.nombre_dueño = validations.name(formData.nombre_dueño);
+    newErrors.telefono_dueño = validations.phone(formData.telefono_dueño);
+    newErrors.correo_dueño = validations.email(formData.correo_dueño);
+    newErrors.direccion_dueño = validations.address(formData.direccion_dueño);
+    
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    // Validar en tiempo real
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'nombre_dueño':
+          error = validations.name(value);
+          break;
+        case 'telefono_dueño':
+          error = validations.phone(value);
+          break;
+        case 'correo_dueño':
+          error = validations.email(value);
+          break;
+        case 'direccion_dueño':
+          error = validations.address(value);
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     try {
       if (editingId) {
         await ownersAPI.update(editingId, formData);
@@ -79,6 +123,7 @@ export const useOwners = () => {
       correo_dueño: '',
       direccion_dueño: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -96,7 +141,9 @@ export const useOwners = () => {
     showForm,
     editingId,
     formData,
+    errors,
     setFormData,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

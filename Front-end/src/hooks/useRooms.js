@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { roomsAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useRooms = () => {
   const [rooms, setRooms] = useState([]);
@@ -9,6 +10,7 @@ export const useRooms = () => {
   const [formData, setFormData] = useState({
     nombre_sala: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchRooms();
@@ -27,8 +29,25 @@ export const useRooms = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.nombre_sala = validations.textMinLength(formData.nombre_sala, 3, 'El nombre de la sala');
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      const error = validations.textMinLength(value, 3, 'El nombre de la sala');
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       if (editingId) {
         await roomsAPI.update(editingId, formData);
@@ -68,6 +87,7 @@ export const useRooms = () => {
 
   const resetForm = () => {
     setFormData({ nombre_sala: '' });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -85,7 +105,8 @@ export const useRooms = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

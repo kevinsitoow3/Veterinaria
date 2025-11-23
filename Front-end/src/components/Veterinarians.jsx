@@ -9,7 +9,9 @@ const Veterinarians = () => {
     showForm,
     editingId,
     formData,
+    errors,
     setFormData,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -27,34 +29,46 @@ const Veterinarians = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={formData.nombre_veterinario}
-            onChange={(e) => setFormData({ ...formData, nombre_veterinario: e.target.value })}
-            required
-          />
-          <input
-            type="email"
-            placeholder="Correo"
-            value={formData.correo_veterinario}
-            onChange={(e) => setFormData({ ...formData, correo_veterinario: e.target.value })}
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Teléfono"
-            value={formData.telefono_veterinario}
-            onChange={(e) => setFormData({ ...formData, telefono_veterinario: e.target.value })}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Especialidad"
-            value={formData.especialidad_veterinario}
-            onChange={(e) => setFormData({ ...formData, especialidad_veterinario: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={formData.nombre_veterinario}
+              onChange={(e) => handleFieldChange('nombre_veterinario', e.target.value)}
+              className={errors.nombre_veterinario ? 'error' : ''}
+            />
+            {errors.nombre_veterinario && <span className="error-message">{errors.nombre_veterinario}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="email"
+              placeholder="Correo"
+              value={formData.correo_veterinario}
+              onChange={(e) => handleFieldChange('correo_veterinario', e.target.value)}
+              className={errors.correo_veterinario ? 'error' : ''}
+            />
+            {errors.correo_veterinario && <span className="error-message">{errors.correo_veterinario}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="tel"
+              placeholder="Teléfono"
+              value={formData.telefono_veterinario}
+              onChange={(e) => handleFieldChange('telefono_veterinario', e.target.value)}
+              className={errors.telefono_veterinario ? 'error' : ''}
+            />
+            {errors.telefono_veterinario && <span className="error-message">{errors.telefono_veterinario}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Especialidad"
+              value={formData.especialidad_veterinario}
+              onChange={(e) => handleFieldChange('especialidad_veterinario', e.target.value)}
+              className={errors.especialidad_veterinario ? 'error' : ''}
+            />
+            {errors.especialidad_veterinario && <span className="error-message">{errors.especialidad_veterinario}</span>}
+          </div>
           <label>
             <input
               type="checkbox"

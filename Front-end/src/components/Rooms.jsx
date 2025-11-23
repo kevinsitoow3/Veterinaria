@@ -9,7 +9,8 @@ const Rooms = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -27,13 +28,16 @@ const Rooms = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Nombre de la sala"
-            value={formData.nombre_sala}
-            onChange={(e) => setFormData({ ...formData, nombre_sala: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre de la sala"
+              value={formData.nombre_sala}
+              onChange={(e) => handleFieldChange('nombre_sala', e.target.value)}
+              className={errors.nombre_sala ? 'error' : ''}
+            />
+            {errors.nombre_sala && <span className="error-message">{errors.nombre_sala}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Sala
           </button>

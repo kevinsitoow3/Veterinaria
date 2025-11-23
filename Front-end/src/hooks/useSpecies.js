@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { speciesAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useSpecies = () => {
   const [species, setSpecies] = useState([]);
@@ -9,6 +10,7 @@ export const useSpecies = () => {
   const [formData, setFormData] = useState({
     nombre_de_especie: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchSpecies();
@@ -27,8 +29,25 @@ export const useSpecies = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.nombre_de_especie = validations.textOnly(formData.nombre_de_especie, 'El nombre de la especie');
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      const error = validations.textOnly(value, 'El nombre de la especie');
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       if (editingId) {
         await speciesAPI.update(editingId, formData);
@@ -68,6 +87,7 @@ export const useSpecies = () => {
 
   const resetForm = () => {
     setFormData({ nombre_de_especie: '' });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -85,7 +105,8 @@ export const useSpecies = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

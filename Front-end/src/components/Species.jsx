@@ -9,7 +9,8 @@ const Species = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -27,13 +28,16 @@ const Species = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Nombre de la especie"
-            value={formData.nombre_de_especie}
-            onChange={(e) => setFormData({ ...formData, nombre_de_especie: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre de la especie"
+              value={formData.nombre_de_especie}
+              onChange={(e) => handleFieldChange('nombre_de_especie', e.target.value)}
+              className={errors.nombre_de_especie ? 'error' : ''}
+            />
+            {errors.nombre_de_especie && <span className="error-message">{errors.nombre_de_especie}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Especie
           </button>

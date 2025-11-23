@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { quotesAPI, petsAPI, veterinariansAPI, servicesAPI, roomsAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const useQuotes = () => {
   const [quotes, setQuotes] = useState([]);
@@ -19,6 +20,7 @@ export const useQuotes = () => {
     fecha_fin: '',
     estado_cita: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchQuotes();
@@ -77,8 +79,81 @@ export const useQuotes = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.id_mascota = validations.select(formData.id_mascota, 'una mascota');
+    newErrors.id_veterinario = validations.select(formData.id_veterinario, 'un veterinario');
+    
+    // Validar que el veterinario seleccionado esté activo
+    if (formData.id_veterinario) {
+      const selectedVet = veterinarians.find(v => v.id_veterinario === parseInt(formData.id_veterinario));
+      if (selectedVet && !selectedVet.estado_veterinario) {
+        newErrors.id_veterinario = 'No se puede crear una cita con un veterinario inactivo';
+      }
+    }
+    
+    newErrors.id_servicio = validations.select(formData.id_servicio, 'un servicio');
+    newErrors.id_sala = validations.select(formData.id_sala, 'una sala');
+    newErrors.fecha_inicio = validations.datetime(formData.fecha_inicio, 'La fecha de inicio');
+    newErrors.fecha_fin = validations.datetime(formData.fecha_fin, 'La fecha de fin');
+    newErrors.estado_cita = validations.quoteStatus(formData.estado_cita);
+    
+    // Validar que fecha fin sea después de fecha inicio
+    if (!newErrors.fecha_inicio && !newErrors.fecha_fin) {
+      const dateRangeError = validations.dateRange(formData.fecha_inicio, formData.fecha_fin);
+      if (dateRangeError) {
+        newErrors.fecha_fin = dateRangeError;
+      }
+    }
+    
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'id_mascota':
+          error = validations.select(value, 'una mascota');
+          break;
+        case 'id_veterinario':
+          error = validations.select(value, 'un veterinario');
+          // Validar que el veterinario seleccionado esté activo
+          if (!error && value) {
+            const selectedVet = veterinarians.find(v => v.id_veterinario === parseInt(value));
+            if (selectedVet && !selectedVet.estado_veterinario) {
+              error = 'No se puede crear una cita con un veterinario inactivo';
+            }
+          }
+          break;
+        case 'id_servicio':
+          error = validations.select(value, 'un servicio');
+          break;
+        case 'id_sala':
+          error = validations.select(value, 'una sala');
+          break;
+        case 'fecha_inicio':
+          error = validations.datetime(value, 'La fecha de inicio');
+          break;
+        case 'fecha_fin':
+          error = validations.datetime(value, 'La fecha de fin');
+          break;
+        case 'estado_cita':
+          error = validations.quoteStatus(value);
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -143,6 +218,7 @@ export const useQuotes = () => {
       fecha_fin: '',
       estado_cita: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -174,17 +250,22 @@ export const useQuotes = () => {
     return room ? room.nombre_sala : 'N/A';
   };
 
+  // Filtrar veterinarios activos
+  const activeVeterinarians = veterinarians.filter(vet => vet.estado_veterinario === true);
+
   return {
     quotes,
     pets,
     veterinarians,
+    activeVeterinarians,
     services,
     rooms,
     loading,
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,

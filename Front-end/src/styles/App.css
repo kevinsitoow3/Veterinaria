@@ -124,6 +124,26 @@
   cursor: pointer;
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form input.error,
+.form select.error,
+.form textarea.error {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 0.875rem;
+  margin-top: -0.5rem;
+  padding-left: 0.5rem;
+}
+
 .btn-primary,
 .btn-submit {
   padding: 0.75rem 1.5rem;

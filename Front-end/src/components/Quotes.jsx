@@ -6,14 +6,15 @@ const Quotes = () => {
   const {
     quotes,
     pets,
-    veterinarians,
+    activeVeterinarians,
     services,
     rooms,
     loading,
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -35,75 +36,104 @@ const Quotes = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <select
-            value={formData.id_mascota}
-            onChange={(e) => setFormData({ ...formData, id_mascota: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Mascota</option>
-            {pets.map((pet) => (
-              <option key={pet.id_mascota} value={pet.id_mascota}>
-                {pet.nombre_mascota}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.id_veterinario}
-            onChange={(e) => setFormData({ ...formData, id_veterinario: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Veterinario</option>
-            {veterinarians.map((vet) => (
-              <option key={vet.id_veterinario} value={vet.id_veterinario}>
-                {vet.nombre_veterinario}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.id_servicio}
-            onChange={(e) => setFormData({ ...formData, id_servicio: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Servicio</option>
-            {services.map((service) => (
-              <option key={service.id_servicio} value={service.id_servicio}>
-                {service.nombre_servicio}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.id_sala}
-            onChange={(e) => setFormData({ ...formData, id_sala: e.target.value })}
-            required
-          >
-            <option value="">Seleccionar Sala</option>
-            {rooms.map((room) => (
-              <option key={room.id_sala} value={room.id_sala}>
-                {room.nombre_sala}
-              </option>
-            ))}
-          </select>
-          <input
-            type="datetime-local"
-            placeholder="Fecha de inicio"
-            value={formData.fecha_inicio}
-            onChange={(e) => setFormData({ ...formData, fecha_inicio: e.target.value })}
-            required
-          />
-          <input
-            type="datetime-local"
-            placeholder="Fecha de fin"
-            value={formData.fecha_fin}
-            onChange={(e) => setFormData({ ...formData, fecha_fin: e.target.value })}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Estado de la cita"
-            value={formData.estado_cita}
-            onChange={(e) => setFormData({ ...formData, estado_cita: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <select
+              value={formData.id_mascota}
+              onChange={(e) => handleFieldChange('id_mascota', e.target.value)}
+              className={errors.id_mascota ? 'error' : ''}
+            >
+              <option value="">Seleccionar Mascota</option>
+              {pets.map((pet) => (
+                <option key={pet.id_mascota} value={pet.id_mascota}>
+                  {pet.nombre_mascota}
+                </option>
+              ))}
+            </select>
+            {errors.id_mascota && <span className="error-message">{errors.id_mascota}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.id_veterinario}
+              onChange={(e) => handleFieldChange('id_veterinario', e.target.value)}
+              className={errors.id_veterinario ? 'error' : ''}
+            >
+              <option value="">Seleccionar Veterinario</option>
+              {activeVeterinarians.map((vet) => (
+                <option key={vet.id_veterinario} value={vet.id_veterinario}>
+                  {vet.nombre_veterinario}
+                </option>
+              ))}
+            </select>
+            {errors.id_veterinario && <span className="error-message">{errors.id_veterinario}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.id_servicio}
+              onChange={(e) => handleFieldChange('id_servicio', e.target.value)}
+              className={errors.id_servicio ? 'error' : ''}
+            >
+              <option value="">Seleccionar Servicio</option>
+              {services.map((service) => (
+                <option key={service.id_servicio} value={service.id_servicio}>
+                  {service.nombre_servicio}
+                </option>
+              ))}
+            </select>
+            {errors.id_servicio && <span className="error-message">{errors.id_servicio}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.id_sala}
+              onChange={(e) => handleFieldChange('id_sala', e.target.value)}
+              className={errors.id_sala ? 'error' : ''}
+            >
+              <option value="">Seleccionar Sala</option>
+              {rooms.map((room) => (
+                <option key={room.id_sala} value={room.id_sala}>
+                  {room.nombre_sala}
+                </option>
+              ))}
+            </select>
+            {errors.id_sala && <span className="error-message">{errors.id_sala}</span>}
+          </div>
+          <div className="form-group">
+            <label>Fecha de inicio *</label>
+            <input
+              type="datetime-local"
+              value={formData.fecha_inicio}
+              onChange={(e) => handleFieldChange('fecha_inicio', e.target.value)}
+              className={errors.fecha_inicio ? 'error' : ''}
+              required
+            />
+            {errors.fecha_inicio && <span className="error-message">{errors.fecha_inicio}</span>}
+          </div>
+          <div className="form-group">
+            <label>Fecha de fin *</label>
+            <input
+              type="datetime-local"
+              value={formData.fecha_fin}
+              onChange={(e) => handleFieldChange('fecha_fin', e.target.value)}
+              className={errors.fecha_fin ? 'error' : ''}
+              required
+            />
+            {errors.fecha_fin && <span className="error-message">{errors.fecha_fin}</span>}
+          </div>
+          <div className="form-group">
+            <select
+              value={formData.estado_cita}
+              onChange={(e) => handleFieldChange('estado_cita', e.target.value)}
+              className={errors.estado_cita ? 'error' : ''}
+            >
+              <option value="">Seleccionar Estado de Cita</option>
+              <option value="Programada">Programada - Cita agendada</option>
+              <option value="Confirmada">Confirmada - Cita confirmada por el cliente</option>
+              <option value="En curso">En curso - Cita en proceso</option>
+              <option value="Completada">Completada - Cita finalizada</option>
+              <option value="Cancelada">Cancelada - Cita cancelada</option>
+              <option value="Reprogramada">Reprogramada - Cita reagendada</option>
+            </select>
+            {errors.estado_cita && <span className="error-message">{errors.estado_cita}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Cita
           </button>

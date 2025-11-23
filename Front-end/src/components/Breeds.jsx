@@ -10,7 +10,8 @@ const Breeds = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
@@ -29,25 +30,31 @@ const Breeds = () => {
 
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
-          <select
-            value={formData.id_especie}
-            onChange={(e) => setFormData({ ...formData, id_especie: parseInt(e.target.value) })}
-            required
-          >
-            <option value="">Seleccionar Especie</option>
-            {species.map((specie) => (
-              <option key={specie.id_especie} value={specie.id_especie}>
-                {specie.nombre_de_especie}
-              </option>
-            ))}
-          </select>
-          <input
-            type="text"
-            placeholder="Nombre de la raza"
-            value={formData.nombre_raza}
-            onChange={(e) => setFormData({ ...formData, nombre_raza: e.target.value })}
-            required
-          />
+          <div className="form-group">
+            <select
+              value={formData.id_especie}
+              onChange={(e) => handleFieldChange('id_especie', e.target.value)}
+              className={errors.id_especie ? 'error' : ''}
+            >
+              <option value="">Seleccionar Especie</option>
+              {species.map((specie) => (
+                <option key={specie.id_especie} value={specie.id_especie}>
+                  {specie.nombre_de_especie}
+                </option>
+              ))}
+            </select>
+            {errors.id_especie && <span className="error-message">{errors.id_especie}</span>}
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nombre de la raza"
+              value={formData.nombre_raza}
+              onChange={(e) => handleFieldChange('nombre_raza', e.target.value)}
+              className={errors.nombre_raza ? 'error' : ''}
+            />
+            {errors.nombre_raza && <span className="error-message">{errors.nombre_raza}</span>}
+          </div>
           <button type="submit" className="btn-submit">
             {editingId ? 'Actualizar' : 'Crear'} Raza
           </button>

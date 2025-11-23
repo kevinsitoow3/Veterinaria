@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { petsAPI, ownersAPI, speciesAPI, breedsAPI } from '../services/api';
+import { validations } from '../utils/validations';
 
 export const usePets = () => {
   const [pets, setPets] = useState([]);
@@ -19,6 +20,7 @@ export const usePets = () => {
     color: '',
     estado: ''
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchPets();
@@ -73,8 +75,64 @@ export const usePets = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.id_dueño = validations.select(formData.id_dueño, 'un dueño');
+    newErrors.nombre_mascota = validations.name(formData.nombre_mascota);
+    newErrors.id_especie = validations.select(formData.id_especie, 'una especie');
+    newErrors.id_raza = validations.select(formData.id_raza, 'una raza');
+    newErrors.sexo_animal = validations.gender(formData.sexo_animal);
+    newErrors.fecha_nacimiento = validations.date(formData.fecha_nacimiento, 'La fecha de nacimiento');
+    newErrors.color = validations.color(formData.color);
+    newErrors.estado = validations.petStatus(formData.estado);
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
+  const handleFieldChange = (field, value) => {
+    if (field === 'id_especie') {
+      setFormData({ ...formData, [field]: value, id_raza: '' });
+    } else {
+      setFormData({ ...formData, [field]: value });
+    }
+    if (errors[field]) {
+      let error = '';
+      switch (field) {
+        case 'id_dueño':
+          error = validations.select(value, 'un dueño');
+          break;
+        case 'nombre_mascota':
+          error = validations.name(value);
+          break;
+        case 'id_especie':
+          error = validations.select(value, 'una especie');
+          break;
+        case 'id_raza':
+          error = validations.select(value, 'una raza');
+          break;
+        case 'sexo_animal':
+          error = validations.gender(value);
+          break;
+        case 'fecha_nacimiento':
+          error = validations.date(value, 'La fecha de nacimiento');
+          break;
+        case 'color':
+          error = validations.color(value);
+          break;
+        case 'estado':
+          error = validations.petStatus(value);
+          break;
+        default:
+          break;
+      }
+      setErrors({ ...errors, [field]: error });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const submitData = {
         ...formData,
@@ -136,6 +194,7 @@ export const usePets = () => {
       color: '',
       estado: ''
     });
+    setErrors({});
     setEditingId(null);
     setShowForm(false);
   };
@@ -173,7 +232,8 @@ export const usePets = () => {
     showForm,
     editingId,
     formData,
-    setFormData,
+    errors,
+    handleFieldChange,
     handleSubmit,
     handleEdit,
     handleDelete,
