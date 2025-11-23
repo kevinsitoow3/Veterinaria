@@ -19,18 +19,3 @@ venv/
 env/
 ENV/
 .venv/
-
-# Node
-node_modules/
-/.pnp
-.pnp.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# React build
-Front-end/build/
-Front-end/.env.local
-Front-end/.env.development.local
-Front-end/.env.test.local
-Front-end/.env.production.local
