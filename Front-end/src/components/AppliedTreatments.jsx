@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppliedTreatments } from '../hooks/useAppliedTreatments';
-import { formatNumber } from '../utils/formatNumber';
+import { formatNumber, unformatNumber } from '../utils/formatNumber';
 import '../styles/AppliedTreatments.css';
 
 const AppliedTreatments = () => {
@@ -22,6 +22,154 @@ const AppliedTreatments = () => {
     handleTreatmentChange
   } = useAppliedTreatments();
 
+  const [displayCantidad, setDisplayCantidad] = useState('');
+  const [displayPrecio, setDisplayPrecio] = useState('');
+  const [displayTotal, setDisplayTotal] = useState('');
+
+  const handleCantidadChange = (e) => {
+    const input = e.target;
+    const value = input.value;
+    const cursorPosition = input.selectionStart;
+    
+    // Remover puntos de separadores de miles pero mantener punto decimal
+    let rawValue = value;
+    const parts = value.split('.');
+    if (parts.length > 1) {
+      // Si hay más de una parte, el último punto es el decimal
+      const integerPart = parts.slice(0, -1).join('').replace(/\./g, '');
+      rawValue = integerPart + '.' + parts[parts.length - 1];
+    } else {
+      rawValue = value.replace(/\./g, '');
+    }
+    
+    // Permitir números y un punto decimal
+    if (rawValue === '' || /^\d*\.?\d*$/.test(rawValue)) {
+      handleFieldChange('cantidad', rawValue);
+      
+      if (rawValue === '') {
+        setDisplayCantidad('');
+      } else {
+        const num = parseFloat(rawValue);
+        if (!isNaN(num) && rawValue !== '') {
+          // Solo formatear si es >= 1000
+          if (num >= 1000) {
+            const integerPart = Math.floor(num);
+            const decimalPart = rawValue.includes('.') ? rawValue.split('.')[1] : '';
+            const formatted = formatNumber(integerPart) + (decimalPart ? '.' + decimalPart : '');
+            setDisplayCantidad(formatted);
+            
+            setTimeout(() => {
+              // Calcular dígitos antes del cursor (sin contar separadores de miles)
+              const beforeCursor = value.substring(0, cursorPosition);
+              const digitsBeforeCursor = beforeCursor.replace(/\./g, '').length;
+              
+              let newPosition = 0;
+              let digitCount = 0;
+              for (let i = 0; i < formatted.length; i++) {
+                if (formatted[i] !== '.') {
+                  digitCount++;
+                }
+                if (digitCount === digitsBeforeCursor) {
+                  newPosition = i + 1;
+                  break;
+                }
+                newPosition = i + 1;
+              }
+              
+              if (digitCount < digitsBeforeCursor) {
+                newPosition = formatted.length;
+              }
+              
+              input.setSelectionRange(newPosition, newPosition);
+            }, 0);
+          } else {
+            setDisplayCantidad(rawValue);
+          }
+        } else {
+          setDisplayCantidad(rawValue);
+        }
+      }
+    }
+  };
+
+  const handlePrecioChange = (e) => {
+    const input = e.target;
+    const value = input.value;
+    const cursorPosition = input.selectionStart;
+    
+    // Remover puntos de separadores de miles pero mantener punto decimal
+    let rawValue = value;
+    const parts = value.split('.');
+    if (parts.length > 1) {
+      const integerPart = parts.slice(0, -1).join('').replace(/\./g, '');
+      rawValue = integerPart + '.' + parts[parts.length - 1];
+    } else {
+      rawValue = value.replace(/\./g, '');
+    }
+    
+    // Permitir números y un punto decimal
+    if (rawValue === '' || /^\d*\.?\d*$/.test(rawValue)) {
+      handleFieldChange('precio_aplicado', rawValue);
+      
+      if (rawValue === '') {
+        setDisplayPrecio('');
+      } else {
+        const num = parseFloat(rawValue);
+        if (!isNaN(num) && rawValue !== '') {
+          const integerPart = Math.floor(Math.abs(num));
+          const decimalPart = rawValue.includes('.') ? rawValue.split('.')[1] : '';
+          const formatted = formatNumber(integerPart) + (decimalPart ? '.' + decimalPart : '');
+          setDisplayPrecio(formatted);
+          
+          setTimeout(() => {
+            // Calcular dígitos antes del cursor (sin contar separadores de miles)
+            const beforeCursor = value.substring(0, cursorPosition);
+            const digitsBeforeCursor = beforeCursor.replace(/\./g, '').length;
+            
+            let newPosition = 0;
+            let digitCount = 0;
+            for (let i = 0; i < formatted.length; i++) {
+              if (formatted[i] !== '.') {
+                digitCount++;
+              }
+              if (digitCount === digitsBeforeCursor) {
+                newPosition = i + 1;
+                break;
+              }
+              newPosition = i + 1;
+            }
+            
+            if (digitCount < digitsBeforeCursor) {
+              newPosition = formatted.length;
+            }
+            
+            input.setSelectionRange(newPosition, newPosition);
+          }, 0);
+        } else {
+          setDisplayPrecio(rawValue);
+        }
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    if (formData.cantidad && !showForm) {
+      setDisplayCantidad('');
+    } else if (formData.cantidad) {
+      setDisplayCantidad(formatNumber(formData.cantidad));
+    }
+    if (formData.precio_aplicado && !showForm) {
+      setDisplayPrecio('');
+    } else if (formData.precio_aplicado) {
+      setDisplayPrecio(formatNumber(formData.precio_aplicado));
+    }
+    if (formData.total) {
+      setDisplayTotal(formatNumber(formData.total));
+    } else {
+      setDisplayTotal('');
+    }
+  }, [formData.cantidad, formData.precio_aplicado, formData.total, showForm]);
+
   return (
     <div className="applied-treatments-container">
       <div className="section-header">
@@ -34,6 +182,7 @@ const AppliedTreatments = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Historial Clínico *</label>
             <select
               value={formData.id_historia}
               onChange={(e) => handleFieldChange('id_historia', e.target.value)}
@@ -49,6 +198,7 @@ const AppliedTreatments = () => {
             {errors.id_historia && <span className="error-message">{errors.id_historia}</span>}
           </div>
           <div className="form-group">
+            <label>Tratamiento *</label>
             <select
               value={formData.id_tratamiento}
               onChange={(e) => handleTreatmentChange(e.target.value)}
@@ -64,34 +214,33 @@ const AppliedTreatments = () => {
             {errors.id_tratamiento && <span className="error-message">{errors.id_tratamiento}</span>}
           </div>
           <div className="form-group">
+            <label>Cantidad *</label>
             <input
-              type="number"
-              step="0.01"
-              placeholder="Cantidad"
-              value={formData.cantidad}
-              onChange={(e) => handleFieldChange('cantidad', e.target.value)}
+              type="text"
+              placeholder="Ej: 1, 2, 5, 10"
+              value={displayCantidad}
+              onChange={handleCantidadChange}
               className={errors.cantidad ? 'error' : ''}
             />
             {errors.cantidad && <span className="error-message">{errors.cantidad}</span>}
           </div>
           <div className="form-group">
+            <label>Precio Aplicado *</label>
             <input
-              type="number"
-              step="0.01"
-              placeholder="Precio aplicado"
-              value={formData.precio_aplicado}
-              onChange={(e) => handleFieldChange('precio_aplicado', e.target.value)}
+              type="text"
+              placeholder="Ej: 100, 500, 1.000"
+              value={displayPrecio}
+              onChange={handlePrecioChange}
               className={errors.precio_aplicado ? 'error' : ''}
             />
             {errors.precio_aplicado && <span className="error-message">{errors.precio_aplicado}</span>}
           </div>
           <div className="form-group">
+            <label>Total (Calculado automáticamente)</label>
             <input
-              type="number"
-              step="1"
-              placeholder="Total"
-              value={formData.total ? Math.floor(parseFloat(formData.total)) : ''}
-              onChange={(e) => handleFieldChange('total', e.target.value)}
+              type="text"
+              placeholder="Se calcula automáticamente"
+              value={displayTotal}
               className={errors.total ? 'error' : ''}
               readOnly
             />

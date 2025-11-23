@@ -31,6 +31,7 @@ const Breeds = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Especie *</label>
             <select
               value={formData.id_especie}
               onChange={(e) => handleFieldChange('id_especie', e.target.value)}
@@ -46,9 +47,10 @@ const Breeds = () => {
             {errors.id_especie && <span className="error-message">{errors.id_especie}</span>}
           </div>
           <div className="form-group">
+            <label>Nombre de la Raza *</label>
             <input
               type="text"
-              placeholder="Nombre de la raza"
+              placeholder="Ej: Labrador, Persa, Pastor Alemán"
               value={formData.nombre_raza}
               onChange={(e) => handleFieldChange('nombre_raza', e.target.value)}
               className={errors.nombre_raza ? 'error' : ''}

@@ -29,9 +29,10 @@ const Species = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Nombre de la Especie *</label>
             <input
               type="text"
-              placeholder="Nombre de la especie"
+              placeholder="Ej: Canino, Felino, Aves"
               value={formData.nombre_de_especie}
               onChange={(e) => handleFieldChange('nombre_de_especie', e.target.value)}
               className={errors.nombre_de_especie ? 'error' : ''}

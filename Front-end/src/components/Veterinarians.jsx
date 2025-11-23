@@ -30,9 +30,10 @@ const Veterinarians = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Nombre del Veterinario *</label>
             <input
               type="text"
-              placeholder="Nombre"
+              placeholder="Ej: Dr. Carlos Rodríguez"
               value={formData.nombre_veterinario}
               onChange={(e) => handleFieldChange('nombre_veterinario', e.target.value)}
               className={errors.nombre_veterinario ? 'error' : ''}
@@ -40,9 +41,10 @@ const Veterinarians = () => {
             {errors.nombre_veterinario && <span className="error-message">{errors.nombre_veterinario}</span>}
           </div>
           <div className="form-group">
+            <label>Correo Electrónico *</label>
             <input
               type="email"
-              placeholder="Correo"
+              placeholder="Ej: carlos.rodriguez@clinicavet.com"
               value={formData.correo_veterinario}
               onChange={(e) => handleFieldChange('correo_veterinario', e.target.value)}
               className={errors.correo_veterinario ? 'error' : ''}
@@ -50,9 +52,10 @@ const Veterinarians = () => {
             {errors.correo_veterinario && <span className="error-message">{errors.correo_veterinario}</span>}
           </div>
           <div className="form-group">
+            <label>Teléfono *</label>
             <input
               type="tel"
-              placeholder="Teléfono"
+              placeholder="Ej: +57 300 1234567"
               value={formData.telefono_veterinario}
               onChange={(e) => handleFieldChange('telefono_veterinario', e.target.value)}
               className={errors.telefono_veterinario ? 'error' : ''}
@@ -60,9 +63,10 @@ const Veterinarians = () => {
             {errors.telefono_veterinario && <span className="error-message">{errors.telefono_veterinario}</span>}
           </div>
           <div className="form-group">
+            <label>Especialidad *</label>
             <input
               type="text"
-              placeholder="Especialidad"
+              placeholder="Ej: Cirugía, Medicina General, Cardiología"
               value={formData.especialidad_veterinario}
               onChange={(e) => handleFieldChange('especialidad_veterinario', e.target.value)}
               className={errors.especialidad_veterinario ? 'error' : ''}

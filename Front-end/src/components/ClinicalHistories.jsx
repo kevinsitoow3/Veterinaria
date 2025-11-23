@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useClinicalHistories } from '../hooks/useClinicalHistories';
+import { formatNumberWithDecimals } from '../utils/formatNumber';
 import '../styles/ClinicalHistories.css';
 
 const ClinicalHistories = () => {
@@ -22,6 +23,60 @@ const ClinicalHistories = () => {
     getVetName
   } = useClinicalHistories();
 
+  const [displayPeso, setDisplayPeso] = useState('');
+  const [displayTemperatura, setDisplayTemperatura] = useState('');
+
+  const handlePesoChange = (e) => {
+    const value = e.target.value;
+    // Permitir números y un punto decimal
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setDisplayPeso(value);
+      handleFieldChange('peso_kg_animal', value);
+    }
+  };
+
+  const handleTemperaturaChange = (e) => {
+    const value = e.target.value;
+    // Permitir números y un punto decimal
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setDisplayTemperatura(value);
+      handleFieldChange('temperatura_animal', value);
+    }
+  };
+
+  const handlePesoBlur = () => {
+    if (formData.peso_kg_animal) {
+      setDisplayPeso(formatNumberWithDecimals(formData.peso_kg_animal));
+    }
+  };
+
+  const handleTemperaturaBlur = () => {
+    if (formData.temperatura_animal) {
+      setDisplayTemperatura(formatNumberWithDecimals(formData.temperatura_animal));
+    }
+  };
+
+  const handlePesoFocus = () => {
+    setDisplayPeso(formData.peso_kg_animal || '');
+  };
+
+  const handleTemperaturaFocus = () => {
+    setDisplayTemperatura(formData.temperatura_animal || '');
+  };
+
+  React.useEffect(() => {
+    if (formData.peso_kg_animal && !showForm) {
+      setDisplayPeso('');
+    } else if (formData.peso_kg_animal) {
+      setDisplayPeso(formatNumberWithDecimals(formData.peso_kg_animal));
+    }
+    if (formData.temperatura_animal && !showForm) {
+      setDisplayTemperatura('');
+    } else if (formData.temperatura_animal) {
+      setDisplayTemperatura(formatNumberWithDecimals(formData.temperatura_animal));
+    }
+  }, [formData.peso_kg_animal, formData.temperatura_animal, showForm]);
+
   return (
     <div className="clinical-histories-container">
       <div className="section-header">
@@ -34,6 +89,7 @@ const ClinicalHistories = () => {
       {showForm && (
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
+            <label>Mascota *</label>
             <select
               value={formData.id_mascota}
               onChange={(e) => handleFieldChange('id_mascota', e.target.value)}
@@ -49,6 +105,7 @@ const ClinicalHistories = () => {
             {errors.id_mascota && <span className="error-message">{errors.id_mascota}</span>}
           </div>
           <div className="form-group">
+            <label>Veterinario *</label>
             <select
               value={formData.id_veterinario}
               onChange={(e) => handleFieldChange('id_veterinario', e.target.value)}
@@ -66,6 +123,7 @@ const ClinicalHistories = () => {
             {errors.id_veterinario && <span className="error-message">{errors.id_veterinario}</span>}
           </div>
           <div className="form-group">
+            <label>Cita *</label>
             <select
               value={formData.id_cita}
               onChange={(e) => handleFieldChange('id_cita', e.target.value)}
@@ -81,30 +139,35 @@ const ClinicalHistories = () => {
             {errors.id_cita && <span className="error-message">{errors.id_cita}</span>}
           </div>
           <div className="form-group">
+            <label>Peso (kg) *</label>
             <input
-              type="number"
-              step="0.1"
-              placeholder="Peso (kg)"
-              value={formData.peso_kg_animal}
-              onChange={(e) => handleFieldChange('peso_kg_animal', e.target.value)}
+              type="text"
+              placeholder="Ej: 5.5, 26.2, 45.0"
+              value={displayPeso}
+              onChange={handlePesoChange}
+              onBlur={handlePesoBlur}
+              onFocus={handlePesoFocus}
               className={errors.peso_kg_animal ? 'error' : ''}
             />
             {errors.peso_kg_animal && <span className="error-message">{errors.peso_kg_animal}</span>}
           </div>
           <div className="form-group">
+            <label>Temperatura (°C) *</label>
             <input
-              type="number"
-              step="0.1"
-              placeholder="Temperatura (°C)"
-              value={formData.temperatura_animal}
-              onChange={(e) => handleFieldChange('temperatura_animal', e.target.value)}
+              type="text"
+              placeholder="Ej: 37.5, 38.4, 37.8"
+              value={displayTemperatura}
+              onChange={handleTemperaturaChange}
+              onBlur={handleTemperaturaBlur}
+              onFocus={handleTemperaturaFocus}
               className={errors.temperatura_animal ? 'error' : ''}
             />
             {errors.temperatura_animal && <span className="error-message">{errors.temperatura_animal}</span>}
           </div>
           <div className="form-group">
+            <label>Síntomas *</label>
             <textarea
-              placeholder="Síntomas"
+              placeholder="Ej: Letargo, pérdida de apetito, vómitos ocasionales"
               value={formData.sintomas}
               onChange={(e) => handleFieldChange('sintomas', e.target.value)}
               className={errors.sintomas ? 'error' : ''}
@@ -113,8 +176,9 @@ const ClinicalHistories = () => {
             {errors.sintomas && <span className="error-message">{errors.sintomas}</span>}
           </div>
           <div className="form-group">
+            <label>Diagnóstico *</label>
             <textarea
-              placeholder="Diagnóstico"
+              placeholder="Ej: Infección bacteriana leve, requiere tratamiento antibiótico"
               value={formData.diagnostico}
               onChange={(e) => handleFieldChange('diagnostico', e.target.value)}
               className={errors.diagnostico ? 'error' : ''}
@@ -123,8 +187,9 @@ const ClinicalHistories = () => {
             {errors.diagnostico && <span className="error-message">{errors.diagnostico}</span>}
           </div>
           <div className="form-group">
+            <label>Plan de Tratamiento *</label>
             <textarea
-              placeholder="Plan de tratamiento"
+              placeholder="Ej: Administrar antibiótico cada 12 horas durante 7 días"
               value={formData.plan_tratamiento}
               onChange={(e) => handleFieldChange('plan_tratamiento', e.target.value)}
               className={errors.plan_tratamiento ? 'error' : ''}
